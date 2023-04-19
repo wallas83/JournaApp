@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { JournalPage } from "../pages/JournalPage";
+import { JournalPage } from "../pages/Journalpage";
 
 export const JournalRoutes = [
 
