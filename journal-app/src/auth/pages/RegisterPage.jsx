@@ -1,13 +1,34 @@
 import {Link as RouterLink} from 'react-router-dom';
-import { Google } from '@mui/icons-material'
 import { Button, Grid, Link, TextField, Typography } from '@mui/material'
 import React from 'react'
 import { AuthLayout } from '../layout/AuthLayout';
+import { useForm } from '../../hooks';
 
+const formData = {
+  email: 'dddddddd',
+  password: '12121212',
+  displayName: 'wilson huanca'
+}
+  const formValidations = {
+      email: [(value) => value.includes('@'), 'El correo debe tener una @'],
+      password: [(value)=> value.length >= 6, 'El password debe tener mas de 6 letras'],
+      displayName: [(value)=> value.length >=1, 'El nombre es obligatorio'],
+  }
 export const RegisterPage = () => {
+
+  const { 
+    
+    displayName, email, password, onInputChange, formState,
+    displayNameValid, emailValid, passwordValid, isFormValid
+  } = useForm(formData, formValidations);
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+    console.log(formState);
+}
   return (
         <AuthLayout title='Crear cuenta'>
-             <form>
+             <form onSubmit={onSubmit}>
           <Grid container>
           <Grid item xs={12} sx={{ mt: 2 }}>
               <TextField
@@ -15,6 +36,11 @@ export const RegisterPage = () => {
                 placeholder="nombre completo"
                 fullWidth
                 type="text"
+                name='displayName'
+                value={displayName}
+                onChange={onInputChange}
+                // error 
+                // helperText
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 2 }}>
@@ -23,6 +49,9 @@ export const RegisterPage = () => {
                 placeholder="correo.goolg@mail.com"
                 fullWidth
                 type="email"
+                name='email'
+                value={email}
+                onChange={onInputChange}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 2 }}>
@@ -31,12 +60,19 @@ export const RegisterPage = () => {
                 label="password"
                 placeholder="password"
                 fullWidth
+                name='password'
+                value={password}
+                onChange={onInputChange}
+                
               />
             </Grid>
             <Grid container spacing={2} sx={{ mb: 2, mt: 1}} >
                 <Grid item xs= { 12 } sm= { 12 }>
-                      <Button variant="contained" fullWidth>
-                        Login
+                      <Button 
+                      type='submit'
+                      variant="contained" 
+                      fullWidth>
+                        Crear cuenta
                       </Button>
                 </Grid>
             
