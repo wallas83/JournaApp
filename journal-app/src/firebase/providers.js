@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import { FirebaseAuth } from "./config";
 
 
@@ -27,19 +27,46 @@ export const signWithInGoogle = async () => {
 export const registerUserWithEmailPassword = async ({ email, password, displayName }) => {
 
     try {
- const resp = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
- const {uid, photoURL} =resp.user;
- console.log(resp);
-     
- return {
-            ok:true,
+        const resp = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
+        //actualizxar el display en Firebase
+        await updateProfile(FirebaseAuth.currentUser, { displayName });
+        const { uid, photoURL } = resp.user;
+        console.log(resp);
+
+        return {
+            ok: true,
             uid, photoURL, email, displayName
         }
 
-} catch (error) {
+    } catch (error) {
         return {
             ok: false,
-            errorMessage
+            // errorMessage: error.message
+            errorMessage : 'El usuario ya existe'
         }
     }
+}
+
+export const loginWithEmailPassword = async ({ email, password}) => {
+    
+    try {
+        const resp =   await signInWithEmailAndPassword(FirebaseAuth, email, password);
+        const {uid, photoURL, displayName} = resp.user;
+        console.log(resp);
+        return {
+            ok: true,
+            uid, photoURL,displayName
+        }
+    } catch (error) {
+        return {
+            ok: false,
+            // errorMessage: error.message
+            errorMessage : error.message
+        }
+    }
+    // signInWithEmailAndPassword()
+}
+
+export const logoutFirebase = async() => {
+    return await FirebaseAuth.signOut();
 }
