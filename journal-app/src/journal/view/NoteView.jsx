@@ -1,12 +1,12 @@
 
-import { Grid, Typography, Button, TextField } from '@mui/material';
-import { SaveOutlined } from '@mui/icons-material'
+import { Grid, Typography, Button, TextField, Input, IconButton } from '@mui/material';
+import { DeleteOutline, SaveOutlined, UploadOutlined } from '@mui/icons-material'
 import { ImageGallery } from '../components';
-import { useForm} from "../../hooks/useForm";
-import { useSelector, useDispatch} from "react-redux";
-import { useMemo, useEffect} from 'react';
+import { useForm } from "../../hooks/useForm";
+import { useSelector, useDispatch } from "react-redux";
+import { useMemo, useEffect, useRef } from 'react';
 import { setActiveNote } from '../../store/journal/journalSlice';
-import { startSaveNote } from '../../store/journal/thunks';
+import { startDeletingNote, startSaveNote, startUploadingFiles } from '../../store/journal/thunks';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.css'
 
@@ -20,21 +20,33 @@ export const NoteView = () => {
     }, [date])
 
     useEffect(() => {
-            dispatch(setActiveNote(formState))
+        dispatch(setActiveNote(formState))
     }, [formState])
-    const onSaveNote =() => {
+    const onSaveNote = () => {
         dispatch(startSaveNote())
     }
+
     useEffect(() => {
-        
-            if(savedMessage.length > 28){
-                console.log(savedMessage.length);
-                Swal.fire('Nota actualizadad', savedMessage, 'success');
-            }
-        
+
+        if (savedMessage.length > 28) {
+            // console.log(savedMessage.length);
+            Swal.fire('Nota actualizadad', savedMessage, 'success');
+        }
+
     }, [savedMessage])
-    
-    return (
+
+    const fileInputRef = useRef();
+    const onFileInputChange = ({ target }) => {
+        if (target.files === 0) return;
+        // console.log(target.files)
+        dispatch( startUploadingFiles(target.files))
+    }
+
+    const ondDelete = () => {
+        dispatch(startDeletingNote());
+    }
+
+    return ( 
         <Grid container
 
             className='animate__animated animate__fadeIn animate__faster'
@@ -46,10 +58,28 @@ export const NoteView = () => {
                 <Typography fontSize={39} fontWeight='light'>{dateString}</Typography>
             </Grid>
             <Grid>
-                <Button 
-                disabled = {isSaving}
-                onClick={onSaveNote}
-                color='primary' sx={{ padding: 2 }}>
+
+                <input
+                    type='file'
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileInputChange}
+                    style={{ display: 'none' }}
+                />
+                <Button
+                    name='subir archivos'
+                    color='primary'
+                    disabled={isSaving}
+                    onClick={() => fileInputRef.current.click()}
+                >
+
+                    <UploadOutlined sx={{ fontSize: 30, mr: 1 }} />
+                    Subir archivo
+                </Button>
+                <Button
+                    disabled={isSaving}
+                    onClick={onSaveNote}
+                    color='primary' sx={{ padding: 2 }}>
                     <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
                     Guardar
                 </Button>
@@ -63,7 +93,7 @@ export const NoteView = () => {
                     placeholder='Ingrese el titulo'
                     label='Titulo'
                     sx={{ border: 'none', mb: 1 }}
-                    name = 'title'
+                    name='title'
                     value={title}
                     onChange={onInputChange}
                 />
@@ -73,7 +103,7 @@ export const NoteView = () => {
                     fullWidth
                     placeholder='Que sucedio el dia de hoy?'
                     minRows={5}
-                    name = 'body'
+                    name='body'
                     value={body}
                     onChange={onInputChange}
 
@@ -82,7 +112,18 @@ export const NoteView = () => {
 
 
             </Grid>
-            <ImageGallery />
+            <Grid container justifyContent='end'>
+                <Button
+                    onClick={ondDelete}
+                    sx={{mt: 2}}
+                    color='error'
+                >
+                    <DeleteOutline/>
+                    Borrar
+                </Button>
+
+            </Grid>
+            <ImageGallery images={note.imageUrls} />
         </Grid>
     )
 

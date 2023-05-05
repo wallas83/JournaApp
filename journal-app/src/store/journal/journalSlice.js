@@ -20,7 +20,10 @@ export const journalSlice = createSlice({
             state.isSaving = true
         },
         addNewEmptyNote: (state, action) => {
-            state.notes.push( action.payload);
+            // !TODO: hcaer la validacicon 
+
+            state.notes = [...state.notes, action.payload]
+
             state.isSaving = false;
         },
 
@@ -37,13 +40,29 @@ export const journalSlice = createSlice({
         },
         updateNotes: (state, action) => {
             state.isSaving = false;
+            console.log(typeof (action.payload))
+
+
             state.notes = state.notes.map(note => {
-                if(note.id === action.payload.id){
+                if (note.id === action.payload.id) {
                     return action.payload;
                 }
+
+
                 return note;
             });
-            state.savedMessage = `${ action.payload.title}, actualizada correctamente!`
+
+            state.savedMessage = `${action.payload.title}, actualizada correctamente!`
+        },
+        setPhotosToActiveNote: (state, action) => {
+            state.active.imageUrls = [...state.active.imageUrls, ...action.payload];
+            state.isSaving = false;
+        },
+        clearNotesLogout: (state) => {
+            state.isSaving = false;
+            state.savedMessage = '';
+            state.notes = [];
+            state.active = null;
         },
         deleteNoteById: (state, action) => {
 
@@ -51,13 +70,15 @@ export const journalSlice = createSlice({
 
     }
 });
-export const { 
+export const {
     addNewEmptyNote,
+    clearNotesLogout,
+    deleteNoteById,
+    isSavingNewNote,
     setActiveNote,
     setNotes,
+    setPhotosToActiveNote,
     setSaving,
     updateNotes,
-    deleteNoteById,
-    isSavingNewNote
 
 } = journalSlice.actions;

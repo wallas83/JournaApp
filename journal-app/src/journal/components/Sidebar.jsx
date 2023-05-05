@@ -30,7 +30,7 @@ export const Sidebar = ({ drawerWidth = 240 }) => {
                 <List>
                     {
                        notes.map(note => (
-                       <SideBarItem  key={note.id} {...note}/>
+                        <SideBarItem  key={note.id} {...note}/>
                         ))
                     }
                 </List>
